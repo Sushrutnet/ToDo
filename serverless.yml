@@ -1,0 +1,48 @@
+service: my-serverless-todo-app
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+
+functions:
+  createTodo:
+    handler: src/createTodo.handler
+    events:
+      - http:
+          path: todo
+          method: post
+  getTodo:
+    handler: src/getTodo.handler
+    events:
+      - http:
+          path: todo/{id}
+          method: get
+  updateTodo:
+    handler: src/updateTodo.handler
+    events:
+      - http:
+          path: todo/{id}
+          method: put
+  deleteTodo:
+    handler: src/deleteTodo.handler
+    events:
+      - http:
+          path: todo/{id}
+          method: delete
+
+resources:
+  Resources:
+    TodoTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-todos
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
